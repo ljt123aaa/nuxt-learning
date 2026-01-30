@@ -2,9 +2,6 @@
   <div>
     <!-- <NuxtRouteAnnouncer />
     <NuxtWelcome /> -->
-    <AppAlert>
-      This is an auto-imported component.
-    </AppAlert>
     <header>
       <nav>
         <ul>
@@ -20,8 +17,36 @@
         </ul>
       </nav>
     </header>
+
+    <AppAlert>
+      This is an auto-imported component.
+    </AppAlert>
+
+    <ul>
+      <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
+    </ul>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { createClient } from '@supabase/supabase-js'
+const config = useRuntimeConfig()
+const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+
+interface Instrument {
+  id: string | number
+  name: string
+  [key: string]: any
+}
+
+const instruments = ref<Instrument[]>([])
+async function getInstruments() {
+  const { data } = await supabase.from('instruments').select()
+  instruments.value = data || []
+}
+
+onMounted(() => {
+  getInstruments()
+})
 </script>
