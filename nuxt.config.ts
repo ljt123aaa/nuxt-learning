@@ -2,6 +2,12 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  // imports: {
+  //   dirs: ['~/composables'],
+  // },
+  // plugins: [
+  //   { src: '~/plugins/toastify.client.ts', mode: 'client' },
+  // ],
   $production: {
     routeRules: {
       '/**': { isr: true },
@@ -21,4 +27,5 @@ export default defineNuxtConfig({
       supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
     },
   },
+  modules: ['@nuxtjs/tailwindcss'],
 })

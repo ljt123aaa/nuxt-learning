@@ -1,52 +1,62 @@
 <template>
   <div>
-    <!-- <NuxtRouteAnnouncer />
-    <NuxtWelcome /> -->
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <NuxtLink to="/about">About</NuxtLink>
-          </li>
-          <li>
-            <NuxtLink to="/posts/1">Post 1</NuxtLink>
-          </li>
-          <li>
-            <NuxtLink to="/posts/2">Post 2</NuxtLink>
-          </li>
-        </ul>
-      </nav>
+    <header class="p-6 flex justify-between items-center text-[#007bff] font-bold">
+      <h1 class="text-3xl">吕金涛的博客(Nuxt4 + Supabase + TailwindCSS)</h1>
+      <Info v-model:userData="user" />
     </header>
 
-    <AppAlert>
-      This is an auto-imported component.
-    </AppAlert>
-
-    <ul>
-      <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
-    </ul>
+    <!-- <ul>
+      <li class="text-lg" v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
+    </ul> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { createClient } from '@supabase/supabase-js'
-const config = useRuntimeConfig()
-const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
 
-interface Instrument {
-  id: string | number
-  name: string
+interface User {
+  id?: string | number
+  avatar?: string
+  name?: string
   [key: string]: any
 }
 
-const instruments = ref<Instrument[]>([])
-async function getInstruments() {
-  const { data } = await supabase.from('instruments').select()
-  instruments.value = data || []
+const user = ref<User>({
+  avatar: '',
+  name: '无'
+})
+
+const config = useRuntimeConfig()
+const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+
+async function getUser() {
+  try {
+    const { data, error } = await supabase.from('user').select('*').eq('id', '1').single()
+
+    if (error) {
+      console.error('获取用户信息失败:', error)
+      return
+    }
+
+    user.value = {
+      ...user.value,
+      ...data
+    }
+
+    if (!user.value.name) {
+      user.value.name = '无'
+    }
+  } catch (err) {
+    console.error('获取用户信息出错:', err)
+  }
 }
 
 onMounted(() => {
-  getInstruments()
+  getUser()
 })
 </script>
+
+<style scoped>
+/* 全局样式 */
+</style>
